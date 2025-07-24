@@ -12,8 +12,7 @@ services:
     networks:
       - ipfs-net
     deploy:
-      placement:
-        constraints: [node.role == manager]
+      mode: global
 
   frontend:
     build:
@@ -24,7 +23,7 @@ services:
     networks:
       - ipfs-net
     deploy:
-      replicas: 2
+      mode: global
 
   nodejs:
     build:
@@ -35,6 +34,7 @@ services:
     ports:
       - "3000"
     deploy:
+      mode: replicated
       replicas: 2
 
   ipfs1:
@@ -77,22 +77,61 @@ services:
       placement:
         constraints: [node.hostname == ipfs-worker-1]
 
-  ipfs-cluster:
+  ipfs-cluster0:
     image: ipfs/ipfs-cluster:latest
     environment:
-      - CLUSTER_SECRET=supersecretclusterkey
+      - CLUSTER_SECRET=REPLACE_WITH_YOUR_BASE64_SECRET
     volumes:
-      - ./ipfs-cluster:/data/ipfs-cluster
+      - ./ipfs-cluster/cluster0:/data/ipfs-cluster
     depends_on:
       - ipfs1
+    networks:
+      - ipfs-net
+    deploy:
+      placement:
+        constraints: [node.hostname == ipfs-manager-1]
+
+  ipfs-cluster1:
+    image: ipfs/ipfs-cluster:latest
+    environment:
+      - CLUSTER_SECRET=REPLACE_WITH_YOUR_BASE64_SECRET
+    volumes:
+      - ./ipfs-cluster/cluster1:/data/ipfs-cluster
+    depends_on:
       - ipfs2
+    networks:
+      - ipfs-net
+    deploy:
+      placement:
+        constraints: [node.hostname == ipfs-manager-2]
+
+  ipfs-cluster2:
+    image: ipfs/ipfs-cluster:latest
+    environment:
+      - CLUSTER_SECRET=REPLACE_WITH_YOUR_BASE64_SECRET
+    volumes:
+      - ./ipfs-cluster/cluster2:/data/ipfs-cluster
+    depends_on:
       - ipfs3
+    networks:
+      - ipfs-net
+    deploy:
+      placement:
+        constraints: [node.hostname == ipfs-manager-3]
+
+  ipfs-cluster3:
+    image: ipfs/ipfs-cluster:latest
+    environment:
+      - CLUSTER_SECRET=REPLACE_WITH_YOUR_BASE64_SECRET
+    volumes:
+      - ./ipfs-cluster/cluster3:/data/ipfs-cluster
+    depends_on:
       - ipfs4
     networks:
       - ipfs-net
     deploy:
-      mode: replicated
-      replicas: 4
+      placement:
+        constraints: [node.hostname == ipfs-worker-1]
 
   prometheus:
     image: prom/prometheus:latest

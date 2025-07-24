@@ -1,0 +1,32 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "IPFS Node Monitoring",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "CPU Usage",
+        "targets": [
+          {
+            "expr": "rate(node_cpu_seconds_total{mode!='idle'}[1m])",
+            "legendFormat": "{{instance}}",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus"
+      },
+      {
+        "type": "logs",
+        "title": "Node Logs",
+        "datasource": "Loki",
+        "targets": [
+          {
+            "expr": "{job=\"varlogs\"}"
+          }
+        ]
+      }
+    ],
+    "schemaVersion": 16,
+    "version": 1
+  }
+}
